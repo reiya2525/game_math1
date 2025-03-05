@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TestPlayerState : MonoBehaviour
@@ -6,31 +8,43 @@ public class TestPlayerState : MonoBehaviour
 
     void Start()
     {
-        // PlayerState コンポーネントを取得
-        playerState = GetComponent<PlayerState>();
+        // PlayerStateコンポーネントをアタッチ
+        playerState = gameObject.AddComponent<PlayerState>();
 
-        // 動作確認のためのデータをセット
+        // テストデータの設定
         playerState.Enter(2);
-        playerState.Enter(11);
         playerState.Enter(3);
+        playerState.Enter(11);
 
-        playerState.question.Add(22);
-        playerState.question.Add(36);
-        playerState.question.Add(12);
+        playerState.question.Enqueue(22);
+        playerState.question.Enqueue(36);
+        playerState.question.Enqueue(12);
 
-        Debug.Log("Before Divide:");
-        Debug.Log("answer = " + string.Join(", ", playerState.answer));
-        Debug.Log("question = " + string.Join(", ", playerState.question));
+        playerState.question2.Add(new List<int> { 2, 11 });
+        playerState.question2.Add(new List<int> { 2, 2, 3, 3 });
+        playerState.question2.Add(new List<int> { 2, 2, 3 });
 
-        // Divide() を実行して確認
-        bool result1 = playerState.Divide();
-        Debug.Log("After 1st Divide: " + result1);
-        Debug.Log("answer = " + string.Join(", ", playerState.answer));
-        Debug.Log("question = " + string.Join(", ", playerState.question));
+        Debug.Log("Initial State:");
+        PrintState();
 
-        bool result2 = playerState.Divide();
-        Debug.Log("After 2nd Divide: " + result2);
-        Debug.Log("answer = " + string.Join(", ", playerState.answer));
-        Debug.Log("question = " + string.Join(", ", playerState.question));
+        // Divide を実行
+        Debug.Log("Performing Divide...");
+        while (playerState.Divide())
+        {
+            PrintState();
+        }
+    }
+
+    void PrintState()
+    {
+        Debug.Log("Answer Queue: " + string.Join(", ", playerState.answer));
+        Debug.Log("Question Queue: " + string.Join(", ", playerState.question));
+
+        string question2Content = "";
+        foreach (var list in playerState.question2)
+        {
+            question2Content += "{" + string.Join(", ", list) + "} ";
+        }
+        Debug.Log("Question2 List: " + question2Content);
     }
 }
